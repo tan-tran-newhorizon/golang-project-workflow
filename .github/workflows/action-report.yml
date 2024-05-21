@@ -56,17 +56,48 @@ jobs:
         if: always()
         run: |
           echo "### Test Coverage Report ###"
-          go tool cover -func=coverage.out
+          go tool cover -func=coverage.out  > coverage.txt
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Convert JSON to Markdown
+        run: |
+          jq -r '
+            def hr: "----\n";
+            def header: "# GolangCI-Lint Report\n\n";
+
+            .Issues | reduce .[] as $item (
+                header;
+                hr +
+                "## \($item.FromLinter)\n\n" +
+                "**File**: \($item.Pos.Filename)\n\n" +
+                "**Line**: \($item.Pos.Line)\n\n" +
+                "**Column**: \($item.Pos.Column)\n\n" +
+                "**Message**: \($item.Text)\n\n" +
+                hr
+            )
+          ' golangci-lint-report.json > golangci-lint-report.md
+
+      - name: Convert coverage to markdown
+        run: |
+          echo "# Code Coverage Report" > coverage.md
+          echo '```' >> coverage.md
+          cat coverage.txt >> coverage.md
+          echo '```' >> coverage.md
 
       - name: Update Wiki pages with reports
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo "# golangci-lint Report" > golangci-lint-report.wiki
-          cat golangci-lint-report.json >> golangci-lint-report.wiki
+          cat golangci-lint-report.md >> golangci-lint-report.wiki
           echo "" >> golangci-lint-report.wiki
+
           echo "# Test Coverage Report" > test-coverage-report.wiki
-          go tool cover -func=coverage.out >> test-coverage-report.wiki
+          cat coverage.md >> test-coverage-report.wiki
+          echo "" >> test-coverage-report.wiki
+
           git config --global user.email "tan.tran@newhorizon-tech.vn"
           git config --global user.name "tan-tran-newhorizon"
           git clone https://${GH_TOKEN}@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
