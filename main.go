@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/tan-tran-newhorizon/golang-project-workflow/docs"
 )
 
 func main() {

@@ -12,11 +12,9 @@ jobs:
   test-and-build-app:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - uses: actions/setup-go@v3
         with:
           go-version: ">=1.19.0"
 
@@ -56,3 +54,21 @@ jobs:
         run: |
           echo "### Test Coverage Report ###"
           go tool cover -func=coverage.out
+
+      # Generate reports in Wiki format
+      - name: Generate reports in Wiki format
+        id: generate-reports
+        run: |
+          echo "# golangci-lint Report" > golangci-lint-report.wiki
+          cat golangci-lint-report.json >> golangci-lint-report.wiki
+          echo "" >> golangci-lint-report.wiki
+          echo "# Test Coverage Report" > test-coverage-report.wiki
+          go tool cover -func=coverage.out >> test-coverage-report.wiki
+
+      # Publish reports to Wiki
+      - name: Publish reports to Wiki
+        uses: "elstudio/actions-publish-wiki@v1"
+        with:
+          wiki-pages: |
+            golangci-lint-report.wiki
+            test-coverage-report.wiki
