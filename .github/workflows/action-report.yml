@@ -69,7 +69,7 @@ jobs:
           go tool cover -func=coverage.out >> test-coverage-report.wiki
           git config --global user.email "tan.tran@newhorizon-tech.vn"
           git config --global user.name "tan-tran-newhorizon"
-          git clone https://$GH_TOKEN@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
+          git clone https://$GH_TOKEN@github.com/tan-tran-newhorizon/golang-project-workflow/wiki
           cd golang-project-workflow.wiki
           mv ../golangci-lint-report.wiki .
           mv ../test-coverage-report.wiki .
