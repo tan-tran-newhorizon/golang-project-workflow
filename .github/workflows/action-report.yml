@@ -67,4 +67,4 @@ jobs:
           git config --global user.name "GitHub Actions"
           git add .
           git commit -m "Update Wiki with golangci-lint and test coverage reports"
-          git push origin HEAD:refs/heads/wiki
+          git push https://$GH_TOKEN@github.com/tan-tran-newhorizon/golang-project-workflow.git HEAD:refs/heads/wiki
