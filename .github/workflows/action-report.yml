@@ -65,7 +65,6 @@ jobs:
           echo "" >> golangci-lint-report.wiki
           echo "# Test Coverage Report" > test-coverage-report.wiki
           go tool cover -func=coverage.out >> test-coverage-report.wiki
-          gh auth login --with-token <<<"${GH_TOKEN}"
+          echo "${GH_TOKEN}" | gh auth login --with-token
           gh wiki edit golangci-lint-report.wiki --body golangci-lint-report.wiki --message "Update Wiki with golangci-lint report"
           gh wiki edit test-coverage-report.wiki --body test-coverage-report.wiki --message "Update Wiki with test coverage report"
-          unset GH_TOKEN  # Clear GH_TOKEN after authentication
