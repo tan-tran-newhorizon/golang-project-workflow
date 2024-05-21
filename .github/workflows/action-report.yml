@@ -1,4 +1,4 @@
-name: CI Pipeline for PR
+name: CI Pipeline for Report
 
 env:
   DISABLE_SWAGGER: "true"
@@ -28,7 +28,7 @@ jobs:
       - name: "go test"
         run: |
           TEST_MODE=true go test ./...
-          
+
       - name: Install golangci-lint
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
@@ -55,20 +55,16 @@ jobs:
           echo "### Test Coverage Report ###"
           go tool cover -func=coverage.out
 
-      # Generate reports in Wiki format
-      - name: Generate reports in Wiki format
-        id: generate-reports
+      # Update Wiki pages with reports using GitHub REST API
+      - name: Update Wiki pages with reports
         run: |
           echo "# golangci-lint Report" > golangci-lint-report.wiki
           cat golangci-lint-report.json >> golangci-lint-report.wiki
           echo "" >> golangci-lint-report.wiki
           echo "# Test Coverage Report" > test-coverage-report.wiki
           go tool cover -func=coverage.out >> test-coverage-report.wiki
-
-      # Publish reports to Wiki
-      - name: Publish reports to Wiki
-        uses: "elstudio/actions-publish-wiki@v1"
-        with:
-          wiki-pages: |
-            golangci-lint-report.wiki
-            test-coverage-report.wiki
+          git config --global user.email "tan.tran@newhorizon-tech.vn"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Update Wiki with golangci-lint and test coverage reports"
+          git push origin HEAD:refs/heads/wiki
