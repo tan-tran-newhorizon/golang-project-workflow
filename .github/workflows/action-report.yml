@@ -12,20 +12,23 @@ jobs:
   test-and-build-app:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
           go-version: ">=1.19.0"
 
-      - name: "go build"
+      - name: Build the Go application
         run: |
-          go install github.com/swaggo/swag/cmd/swag@v1.8.12 && swag init
-          go get
+          go install github.com/swaggo/swag/cmd/swag@v1.8.12
+          swag init
+          go get -v
           CGO_ENABLED=0 go build -o ./dms-api
           ls -lah
-          
-      - name: "go test"
+
+      - name: Run Go tests
         run: |
           TEST_MODE=true go test ./...
 
@@ -33,7 +36,7 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
 
-      - name: "static and security check"
+      - name: Run static and security checks
         continue-on-error: true
         run: |
           golangci-lint run ./... --out-format json > golangci-lint-report.json
@@ -55,7 +58,6 @@ jobs:
           echo "### Test Coverage Report ###"
           go tool cover -func=coverage.out
 
-      # Update Wiki pages with reports using GitHub REST API
       - name: Update Wiki pages with reports
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -65,6 +67,12 @@ jobs:
           echo "" >> golangci-lint-report.wiki
           echo "# Test Coverage Report" > test-coverage-report.wiki
           go tool cover -func=coverage.out >> test-coverage-report.wiki
-          echo "${GH_TOKEN}" | gh auth login --with-token
-          gh wiki edit golangci-lint-report.wiki --body golangci-lint-report.wiki --message "Update Wiki with golangci-lint report"
-          gh wiki edit test-coverage-report.wiki --body test-coverage-report.wiki --message "Update Wiki with test coverage report"
+          git config --global user.email "tan.tran@newhorizon-tech.vn"
+          git config --global user.name "tan-tran-newhorizon"
+          git clone https://$GH_TOKEN@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
+          cd golang-project-workflow.wiki
+          mv ../golangci-lint-report.wiki .
+          mv ../test-coverage-report.wiki .
+          git add golangci-lint-report.wiki test-coverage-report.wiki
+          git commit -m "Update Wiki with golangci-lint and test coverage reports"
+          git push origin master
