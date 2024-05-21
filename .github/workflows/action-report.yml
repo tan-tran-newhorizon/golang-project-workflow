@@ -68,3 +68,4 @@ jobs:
           gh auth login --with-token <<<"${GH_TOKEN}"
           gh wiki edit golangci-lint-report.wiki --body golangci-lint-report.wiki --message "Update Wiki with golangci-lint report"
           gh wiki edit test-coverage-report.wiki --body test-coverage-report.wiki --message "Update Wiki with test coverage report"
+          unset GH_TOKEN  # Clear GH_TOKEN after authentication
