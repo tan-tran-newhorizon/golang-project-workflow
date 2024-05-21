@@ -1,0 +1,34 @@
+run:
+  timeout: 5m
+  tests: false
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - gosec
+
+issues:
+  exclude-rules:
+    - linters:
+        - errcheck
+      text: ".*error is not checked.*"
+    - linters:
+        - govet
+      text: ".*shadowing.*"
+
+linters-settings:
+  gosec:
+    excludes:
+      - G104  # Example: exclude specific gosec rule
+  govet:
+    enable:
+     - shadow
+  errcheck:
+    check-type-assertions: true
+    exclude-functions:
+      - fmt.Errorf
+  staticcheck:
+    checks:
+      - "all"
