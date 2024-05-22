@@ -38,7 +38,7 @@ jobs:
       - name: "static and security check"
         continue-on-error: true
         run: |
-          golangci-lint run ./... --out-format json > golangci-lint-report.json
+          golangci-lint run ./... -v --out-format json > golangci-lint-report.json
 
       - name: Display golangci-lint report
         if: always()

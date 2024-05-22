@@ -39,7 +39,7 @@ jobs:
       - name: Run static and security checks
         continue-on-error: true
         run: |
-          golangci-lint run ./... --out-format json > golangci-lint-report.json
+          golangci-lint run ./... -v --out-format json > golangci-lint-report.json
 
       - name: Display golangci-lint report
         if: always()
@@ -62,7 +62,7 @@ jobs:
         run: sudo apt-get install -y jq
 
       - name: Generate Markdown report
-        run: ./generate_lint_report.sh
+        run: .deploy/generate_lint_report.sh
 
       - name: Convert coverage to markdown
         run: |
