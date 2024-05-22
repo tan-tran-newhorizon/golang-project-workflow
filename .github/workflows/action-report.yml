@@ -25,7 +25,7 @@ jobs:
           go install github.com/swaggo/swag/cmd/swag@v1.8.12
           swag init
           go get -v
-          CGO_ENABLED=0 go build -o ./dms-api
+          CGO_ENABLED=0 go build -o ./test-api
           ls -lah
 
       - name: Run Go tests
@@ -61,23 +61,8 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Convert JSON to Markdown
-        run: |
-          jq -r '
-            def hr: "----\n";
-            def header: "# GolangCI-Lint Report\n\n";
-
-            .Issues | reduce .[] as $item (
-                header;
-                hr +
-                "## \($item.FromLinter)\n\n" +
-                "**File**: \($item.Pos.Filename)\n\n" +
-                "**Line**: \($item.Pos.Line)\n\n" +
-                "**Column**: \($item.Pos.Column)\n\n" +
-                "**Message**: \($item.Text)\n\n" +
-                hr
-            )
-          ' golangci-lint-report.json > golangci-lint-report.md
+      - name: Generate Markdown report
+        run: ./generate_lint_report.sh
 
       - name: Convert coverage to markdown
         run: |

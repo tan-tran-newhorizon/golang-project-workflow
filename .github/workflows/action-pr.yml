@@ -24,7 +24,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.12 && swag init
           go get
-          CGO_ENABLED=0 go build -o ./dms-api
+          CGO_ENABLED=0 go build -o ./test-api
           ls -lah
           
       - name: "go test"
