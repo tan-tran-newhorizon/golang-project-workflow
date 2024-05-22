@@ -87,7 +87,6 @@ jobs:
           git config --global user.name "tan-tran-newhorizon"
           git clone https://${GH_TOKEN}@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
           cd golang-project-workflow.wiki
-          rm -rf golangci-lint-report.wiki golangci-lint-report.md test-coverage-report.wiki
           mv ../golangci-lint-report.wiki .
           mv ../test-coverage-report.wiki .
           git add golangci-lint-report.wiki test-coverage-report.wiki
