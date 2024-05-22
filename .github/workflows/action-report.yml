@@ -75,6 +75,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          rm -rf golangci-lint-report.wiki golangci-lint-report.md test-coverage-report.wiki
           echo "# golangci-lint Report" > golangci-lint-report.wiki
           cat golangci-lint-report.md >> golangci-lint-report.wiki
           echo "" >> golangci-lint-report.wiki
