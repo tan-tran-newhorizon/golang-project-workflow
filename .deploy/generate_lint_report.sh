@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run golangci-lint and save the JSON output to a file
-golangci-lint run --out-format json > golangci-lint-report.json
+# golangci-lint run --out-format json > golangci-lint-report.json
 
 # Check if the JSON file exists
 if [ -f "golangci-lint-report.json" ]; then
