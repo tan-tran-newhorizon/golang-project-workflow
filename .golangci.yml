@@ -1,6 +1,80 @@
 run:
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
   timeout: 5m
+
+  # Exit code when at least one issue was found.
+  # Default: 1
+  issues-exit-code: 1
+  
+  # Include test files or not.
   tests: false
+
+    # Allow multiple parallel golangci-lint instances running.
+  # If false, golangci-lint acquires file lock on start.
+  # Default: false
+  allow-parallel-runners: true
+
+  # Allow multiple golangci-lint instances running, but serialize them around a lock.
+  # If false, golangci-lint exits with an error if it fails to acquire file lock on start.
+  # Default: false
+  allow-serial-runners: true
+
+
+output:
+  sort-results: true
+
+  # Order to use when sorting results.
+  # Require `sort-results` to `true`.
+  # Possible values: `file`, `linter`, and `severity`.
+  #
+  # If the severity values are inside the following list, they are ordered in this order:
+  #   1. error
+  #   2. warning
+  #   3. high
+  #   4. medium
+  #   5. low
+  # Either they are sorted alphabetically.
+  #
+  # Default: ["file"]
+  sort-order:
+    - linter
+    - severity
+    - file # filepath, line, and column.
+
+  # Show statistics per linter.
+  # Default: false
+  show-stats: true
+
+linters-settings:
+  errcheck:
+    # Report about not checking of errors in type assertions: `a := b.(MyStruct)`.
+    # Such cases aren't reported by default.
+    # Default: false
+    check-type-assertions: true
+    check-blank: true
+    exclude-functions:
+      - fmt.Errorf
+
+  gosec:
+    # To specify a set of rules to explicitly exclude.
+    # Available rules: https://github.com/securego/gosec#available-rules
+    # Default: []
+    excludes:
+      - G201 # SQL query construction using format string
+      - G202 # SQL query construction using string concatenation
+      - G401 # Detect the usage of DES, RC4, MD5 or SHA1
+      - G501 # Import blocklist: crypto/md5
+      - G502 # Import blocklist: crypto/des
+      - G503 # Import blocklist: crypto/rc4
+      - G504 # Import blocklist: net/http/cgi
+      - G505 # Import blocklist: crypto/sha1
+
+  staticcheck:
+    # SAxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
+    # Default: ["*"]
+    checks: ["all"]
+
 
 linters:
   enable:
@@ -9,26 +83,14 @@ linters:
     - staticcheck
     - gosec
 
+
 issues:
   exclude-rules:
-    - linters:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
         - errcheck
-      text: ".*error is not checked.*"
-    - linters:
-        - govet
-      text: ".*shadowing.*"
+        - gosec
 
-linters-settings:
-  gosec:
-    excludes:
-      - G104  # Example: exclude specific gosec rule
-  govet:
-    enable:
-     - shadow
-  errcheck:
-    check-type-assertions: true
-    exclude-functions:
-      - fmt.Errorf
-  staticcheck:
-    checks:
-      - "all"
+  exclude-dirs:
+    - docs/*

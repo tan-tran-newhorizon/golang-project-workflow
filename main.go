@@ -1,31 +1,49 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/tan-tran-newhorizon/golang-project-workflow/docs"
+	"github.com/tan-tran-newhorizon/golang-project-workflow/handlers"
 )
 
 func main() {
-	r := gin.Default()
+	// Seed the random number generator with the current time
+	rand.Seed(time.Now().UnixNano())
 
-	r.GET("/ping", func(c *gin.Context) {
+	// Generate a random token for authentication
+	token := generateToken()
+	fmt.Println("Generated token:", token)
+
+	router := gin.Default()
+
+	// Basic health check endpoint
+	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
-	r.GET("/hello/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello " + name,
-		})
-	})
+	// User endpoints
+	router.POST("/users", handlers.CreateUser)
+	router.GET("/users/:id", handlers.GetUser)
 
-	r.Run(":3006")
-	// Capture the error returned by r.Run and handle it
-	// if err := r.Run(":3006"); err != nil {
-	// 	log.Fatalf("Failed to run server: %v", err)
-	// }
+	// Example of an unhandled error (errcheck will catch this)
+	f, _ := os.Open("somefile.txt") // This is intentionally incorrect
+	defer f.Close()
+
+	router.Run(":8022")
+}
+
+func generateToken() string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	token := make([]byte, 32)
+	for i := range token {
+		token[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(token)
 }
