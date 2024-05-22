@@ -9,6 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tan-tran-newhorizon/golang-project-workflow/handlers"
+
+	_ "github.com/tan-tran-newhorizon/golang-project-workflow/docs"
 )
 
 func main() {
