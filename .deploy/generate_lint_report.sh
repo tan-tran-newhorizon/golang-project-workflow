@@ -18,19 +18,19 @@ INPUT_FILE="$1"
 SUMMARY=$(jq -r '
   .Issues | group_by(.FromLinter) | 
   map({linter: .[0].FromLinter, count: length}) | 
-  "4 issues:\n" + 
+  "== 4 issues:\n ==" + 
   (map("* \(.linter): \(.count)") | join("\n"))
 ' "$INPUT_FILE")
 
 # Extract and format the issues in MediaWiki format
 DETAILS=$(jq -r '
   .Issues[] | 
-  "== File: " + .Pos.Filename + " ==\n" +
-  "=== Line: " + (.Pos.Line | tostring) + ", Col: " + (.Pos.Column | tostring) + " ===\n" +
+  "=== File: " + .Pos.Filename + " ===\n" +
+  "==== Line: " + (.Pos.Line | tostring) + ", Col: " + (.Pos.Column | tostring) + " ====\n" +
   "* Linter: " + .FromLinter + "\n" +
   "* Message: " + .Text + "\n" +
   "* Source:\n<code>" + (.SourceLines | join("\n")) + "</code>\n"
 ' "$INPUT_FILE")
 
 # Combine the summary and details
-echo -e "$SUMMARY\n\n$DETAILS"
+echo -e "$SUMMARY\n\n== Details ==\n$DETAILS"
