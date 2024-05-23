@@ -92,5 +92,6 @@ jobs:
           # mv ../test-coverage-report.wiki .
           # git add golangci-lint-report.wiki test-coverage-report.wiki
           rm -rf *
+          git add *
           git commit -m "Update Wiki with golangci-lint and test coverage reports"
           git push origin master
