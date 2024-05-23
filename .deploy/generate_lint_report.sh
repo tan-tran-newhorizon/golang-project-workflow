@@ -13,4 +13,4 @@ echo "! File !! Line !! Column !! Message !! Linter"
 jq -r '.Issues[] | "|-\n| \(.FromLinter) || \(.Pos.Filename) || \(.Pos.Line) || \(.Pos.Column) || \(.Text)"' golangci-lint-report.json
 
 # End the MediaWiki table
-echo "|}"
+echo "|}" > golangci-lint-report.md
