@@ -76,7 +76,7 @@ jobs:
           cd golang-project-workflow.wiki
           ls -l
           rm -rf golangci-lint-report.wiki
-          mv ../static-and-security-check-report.wiki.wiki .
+          mv ../static-and-security-check-report.wiki .
           mv ../test-coverage-report.wiki .
           git add static-and-security-check-report.wiki test-coverage-report.wiki
           git commit -m "Update Wiki with static check, security check and test coverage reports"
