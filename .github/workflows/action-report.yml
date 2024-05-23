@@ -88,8 +88,9 @@ jobs:
           git clone https://${GH_TOKEN}@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
           cd golang-project-workflow.wiki
           ls -l
-          mv ../golangci-lint-report.wiki .
-          mv ../test-coverage-report.wiki .
-          git add golangci-lint-report.wiki test-coverage-report.wiki
+          # mv ../golangci-lint-report.wiki .
+          # mv ../test-coverage-report.wiki .
+          # git add golangci-lint-report.wiki test-coverage-report.wiki
+          rm -rf *
           git commit -m "Update Wiki with golangci-lint and test coverage reports"
           git push origin master
