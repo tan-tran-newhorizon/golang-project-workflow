@@ -27,7 +27,7 @@ BEGIN {
     total_line = ""
 }
 /total:/ {
-    total_line = "* '''Total Coverage''': " $NF
+    total_line = " '''Total Coverage''': " $NF
     next
 }
 NR > 1 {
