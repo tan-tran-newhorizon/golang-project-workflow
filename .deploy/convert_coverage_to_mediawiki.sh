@@ -30,8 +30,8 @@ BEGIN {
     next
 }
 NR > 1 {
-    print "|-"
-    print "| " $1 " || " $2 " || " $NF
+    printf("|- \n")
+    printf("| %s || %s || %s \n", $1, $2, $NF)
 }
 END {
     print "|}"
