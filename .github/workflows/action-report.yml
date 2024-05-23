@@ -36,6 +36,9 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Run static and security checks
         continue-on-error: true
         run: |
@@ -47,49 +50,35 @@ jobs:
           echo "### golangci-lint Report ###"
           cat golangci-lint-report.json
 
+      - name: Generate MediaWiki report for golangci-lint
+        run: .deploy/convert_golangci_lint_to_mediawiki.sh  golangci-lint-report.json >  static-and-security-check-report.wiki
+
       - name: Run tests and capture coverage
         run: |
           go test ./... -coverprofile=coverage.out
-          go tool cover -func=coverage.out
 
       - name: Display coverage report
         if: always()
         run: |
           echo "### Test Coverage Report ###"
-          go tool cover -func=coverage.out  > coverage.txt
+          go tool cover -func=coverage.out
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Generate Markdown report
-        run: .deploy/generate_lint_report.sh  golangci-lint-report.json >  golangci-lint-report.md
-
-      - name: Convert coverage to markdown
-        run: |
-          echo "# Code Coverage Report" > coverage.md
-          echo '```' >> coverage.md
-          cat coverage.txt >> coverage.md
-          echo '```' >> coverage.md
+      - name: Generate MediaWiki report for test coverage report
+        run: .deploy/convert_coverage_to_mediawiki.sh  coverage.out >  test-coverage-report.wiki
 
       - name: Update Wiki pages with reports
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          echo "# golangci-lint Report" > golangci-lint-report.wiki
-          cat golangci-lint-report.md >> golangci-lint-report.wiki
-          echo "" >> golangci-lint-report.wiki
-
-          echo "# Test Coverage Report" > test-coverage-report.wiki
-          cat coverage.md >> test-coverage-report.wiki
-          echo "" >> test-coverage-report.wiki
-
           git config --global user.email "tan.tran@newhorizon-tech.vn"
           git config --global user.name "tan-tran-newhorizon"
           git clone https://${GH_TOKEN}@github.com/tan-tran-newhorizon/golang-project-workflow.wiki.git
           cd golang-project-workflow.wiki
           ls -l
-          mv ../golangci-lint-report.wiki .
-          mv ../test-coverage-report.wiki .
-          git add golangci-lint-report.wiki test-coverage-report.wiki
-          git commit -m "Update Wiki with golangci-lint and test coverage reports"
+          rm -rf golangci-lint-report.wiki
+          git add -U
+          # mv ../static-and-security-check-report.wiki.wiki .
+          # mv ../test-coverage-report.wiki .
+          # git add static-and-security-check-report.wiki test-coverage-report.wiki
+          git commit -m "Update Wiki with static check, security check and test coverage reports"
           git push origin master
