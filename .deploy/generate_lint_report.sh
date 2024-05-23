@@ -1,16 +1,24 @@
 #!/bin/bash
-# Check if jq is installed (jq is a JSON processor)
-if ! command -v jq &> /dev/null; then
-    echo "jq is required but not installed. Please install jq and try again."
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null
+then
+    echo "jq could not be found. Please install jq to use this script."
+    exit
+fi
+
+# Check if the input file is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 path_to_golangci_lint_json_output"
     exit 1
 fi
 
-# Start the MediaWiki formatted output
-echo "{| class=\"wikitable\""
-echo "! File !! Line !! Column !! Message !! Linter"
+INPUT_FILE="$1"
 
-# Parse the JSON and convert to MediaWiki format
-jq -r '.Issues[] | "|-\n| \(.FromLinter) || \(.Pos.Filename) || \(.Pos.Line) || \(.Pos.Column) || \(.Text)"' golangci-lint-report.json
-
-# End the MediaWiki table
-echo "|}" > golangci-lint-report.md
+# Read and parse JSON, then convert to MediaWiki format
+jq -r '.Issues[] | 
+    "== File: \(.Pos.Filename) ==\n" +
+    "=== Line: \(.Pos.Line), Col: \(.Pos.Column) ===\n" +
+    "* Linter: \(.FromLinter)\n" +
+    "* Message: \(.Text)\n" +
+    "* Source: <code>\(.SourceLines | join("\n"))</code>\n"' "$INPUT_FILE"
