@@ -61,10 +61,10 @@ jobs:
         if: always()
         run: |
           echo "### Test Coverage Report ###"
-          go tool cover -func=coverage.out
+          go tool cover -func=coverage.out >  coverage.txt
 
       - name: Generate MediaWiki report for test coverage report
-        run: .deploy/convert_coverage_to_mediawiki.sh  coverage.out >  test-coverage-report.wiki
+        run: .deploy/convert_coverage_to_mediawiki.sh  coverage.txt >  test-coverage-report.wiki
 
       - name: Update Wiki pages with reports
         env:
