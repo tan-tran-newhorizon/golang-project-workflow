@@ -24,9 +24,10 @@ echo "$COVERAGE_SUMMARY" | awk '
 BEGIN {
     print "{| class=\"wikitable\""
     print "! File !! Function !! Coverage"
+    total_line = ""
 }
 /total:/ {
-    total = "* '''Total Coverage''': " $NF
+    total_line = "* '''Total Coverage''': " $NF
     next
 }
 NR > 1 {
@@ -36,6 +37,6 @@ NR > 1 {
 END {
     print "|}"
     print ""
-    print total
+    print total_line
 }
 '
