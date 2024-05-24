@@ -62,7 +62,6 @@ jobs:
       - name: Run tests and capture coverage
         if: env.CHANGED_GO_FILES != ''
         run: |
-          echo "" > coverage.out
           echo "=== Test files ==="
           # Read file names from the text file
           while IFS= read -r file; do
@@ -79,7 +78,11 @@ jobs:
               rm coverage_tmp.out
             fi
           done < go-files.txt
-          go tool cover -func=coverage.out
+          if [ ! -f "coverage.out" ]; then
+              echo "No coverage data available because PR doesn't have new golang code (not include test files)."
+          else
+              go tool cover -func=coverage.out
+          fi
 
       - name: Check coverage threshold
         if: env.CHANGED_GO_FILES != ''
