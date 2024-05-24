@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate MediaWiki report for golangci-lint
         run: |
-          echo "Report Id: ${branch}-${commit_id}-${unique_id}" > static-and-security-check-report.wiki
+          echo "'''Report Id:''' ${branch}_${commit_id}_${unique_id}" > static-and-security-check-report.wiki
           .deploy/convert_golangci_lint_to_mediawiki.sh  golangci-lint-report.json >>  static-and-security-check-report.wiki
 
       - name: Run tests and capture coverage
@@ -77,7 +77,7 @@ jobs:
 
       - name: Generate MediaWiki report for test coverage report
         run: |
-          echo "Report Id: ${branch}-${commit_id}-${unique_id}" >  test-coverage-report.wiki
+          echo "'''Report Id:'''' ${branch}-${commit_id}-${unique_id}" >  test-coverage-report.wiki
           .deploy/convert_coverage_to_mediawiki.sh  coverage.txt >>  test-coverage-report.wiki
 
       - name: Update Wiki pages with reports
