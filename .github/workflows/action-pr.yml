@@ -69,9 +69,10 @@ jobs:
             if [[ "$file" == *_test.go ]]; then
               echo "==== $file"
               # Extract test functions from each file
+              PACKAGE_NAME=$(dirname "$file")
               TEST_FUNCTIONS=$(grep -oE '^func +Test[A-Za-z0-9_]+\(' "$file" | grep -vE '^\s*//' | sed -E 's/func +(Test[A-Za-z0-9_]+)\(.*\)/\1/' | paste -sd "|" - | tr -d '()' | sed 's/func //g')
               # Run tests for each file
-              go test -v "./$file" -run "$(echo ${TEST_FUNCTIONS} | tr -d ' ' | sed 's/|/|/g')"
+              go test -v "./$PACKAGE_NAME" -run "$(echo ${TEST_FUNCTIONS} | tr -d ' ' | sed 's/|/|/g')"
             fi
           done < go-files.txt
           go tool cover -func=coverage.out

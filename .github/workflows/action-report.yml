@@ -78,7 +78,7 @@ jobs:
 
       - name: Generate MediaWiki report for test coverage report
         run: |
-          echo "'''Report Id:'''' ${branch}-${commit_id}-${unique_id}" >  test-coverage-report.wiki
+          echo "'''Report Id:''' ${branch}-${commit_id}-${unique_id}" >  test-coverage-report.wiki
           .deploy/convert_coverage_to_mediawiki.sh  coverage.txt >>  test-coverage-report.wiki
 
       - name: Update Wiki pages with reports
