@@ -31,17 +31,19 @@ jobs:
           TEST_MODE=true go test ./...
 
       - name: Fetch all branches
-        run: git fetch --all
+        run: git fetch origin +refs/heads/*:refs/remotes/origin/*
 
       - name: Get list of changed files
         id: changed-files
         run: |
-          echo "$(git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }})" > changed-files.txt
-
+          echo "$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }})" > changed-files.txt
+          cat changed-files.txt
+          
       - name: Filter Go files
         id: filter-go-files
         run: |
           grep '.go$' changed-files.txt > go-files.txt || true
+          cat go-files.txt
           echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
           
       - name: Install golangci-lint
