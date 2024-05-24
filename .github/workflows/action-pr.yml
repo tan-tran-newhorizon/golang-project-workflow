@@ -61,7 +61,7 @@ jobs:
 
       - name: Run tests on changed files
         run: |
-          git diff --name-only main...HEAD | grep '.go$' | xargs go test -coverprofile=coverage.out
+          git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }}) | grep '.go$' | xargs go test -coverprofile=coverage.out
 
       - name: Check coverage threshold
         if: env.CHANGED_GO_FILES != ''
