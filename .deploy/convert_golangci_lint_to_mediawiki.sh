@@ -18,7 +18,7 @@ INPUT_FILE="$1"
 SUMMARY=$(jq -r '
   .Issues | group_by(.FromLinter) | 
   map({linter: .[0].FromLinter, count: length}) | 
-  "== 4 issues: ==\n " + 
+  "== 4 issues: ==\n" + 
   (map("* \(.linter): \(.count)") | join("\n"))
 ' "$INPUT_FILE")
 
