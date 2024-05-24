@@ -37,12 +37,14 @@ jobs:
         id: changed-files
         run: |
           echo "$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }})" > changed-files.txt
+          echo "changed-files.txt"
           cat changed-files.txt
           
       - name: Filter Go files
         id: filter-go-files
         run: |
           grep '.go$' changed-files.txt > go-files.txt || true
+          echo "go-files.txt"
           cat go-files.txt
           echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
           
@@ -53,10 +55,14 @@ jobs:
       - name: Run static and security checks
         if: env.CHANGED_GO_FILES != ''
         run: |
+          echo "go-files.txt"
+          cat go-files.txt
           golangci-lint run $(cat go-files.txt)
 
       - name: Run tests and capture coverage
         if: env.CHANGED_GO_FILES != ''
         run: |
-          TEST_MODE=true go test ./... -coverprofile=coverage.out $(cat go-files.txt)
+          echo "go-files.txt"
+          cat go-files.txt
+          TEST_MODE=true go test $(cat go-files.txt) -coverprofile=coverage.out 
           go tool cover -func=coverage.out
