@@ -46,7 +46,7 @@ jobs:
           grep '.go$' changed-files.txt > go-files.txt || true
           echo "=== Go files ==="
           cat go-files.txt
-          echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
+          echo "CHANGED_GO_FILES=$(grep '.go$' go-files.txt)" >> $GITHUB_ENV
           
       - name: Install golangci-lint
         run: |
