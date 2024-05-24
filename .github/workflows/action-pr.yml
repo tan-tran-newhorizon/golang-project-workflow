@@ -26,6 +26,13 @@ jobs:
           CGO_ENABLED=0 go build -o ./test-api
           ls -lah
 
+      - name: Run Go tests
+        run: |
+          TEST_MODE=true go test ./...
+
+      - name: Fetch all branches
+        run: git fetch --all
+
       - name: Get list of changed files
         id: changed-files
         run: |
@@ -36,10 +43,6 @@ jobs:
         run: |
           grep '.go$' changed-files.txt > go-files.txt || true
           echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
-
-      - name: Run Go tests
-        run: |
-          TEST_MODE=true go test ./...
           
       - name: Install golangci-lint
         run: |
