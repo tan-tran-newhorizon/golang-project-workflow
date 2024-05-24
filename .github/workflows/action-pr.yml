@@ -36,7 +36,7 @@ jobs:
       - name: Get list of changed files
         id: changed-files
         run: |
-          echo "$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }})" > changed-files.txt
+          echo "$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }})" > changed-files.txt
           cat changed-files.txt
           
       - name: Filter Go files
