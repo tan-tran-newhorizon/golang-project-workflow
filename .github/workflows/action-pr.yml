@@ -87,10 +87,14 @@ jobs:
       - name: Check coverage threshold
         if: env.CHANGED_GO_FILES != ''
         run: |
-          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | tr -d '%')
-          if [ "$coverage" -lt "30" ]; then
-            echo "Coverage is below threshold. Current coverage is $coverage%"
-            exit 1
+          if [ ! -f "coverage.out" ]; then
+              echo "No coverage data available because PR doesn't have new golang code (not include test files)."
           else
-            echo "Coverage is above threshold. Current coverage is $coverage%"
+            coverage=$(cat coverage.out | grep total | awk '{print $3}' | tr -d '%')
+            if [ "$coverage" -lt "30" ]; then
+              echo "Coverage is below threshold. Current coverage is $coverage%"
+              exit 1
+            else
+              echo "Coverage is above threshold. Current coverage is $coverage%"
+            fi
           fi
