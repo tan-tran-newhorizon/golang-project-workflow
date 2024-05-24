@@ -50,8 +50,20 @@ jobs:
           echo "### golangci-lint Report ###"
           cat golangci-lint-report.json
 
+      - name: Get branch, commit ID, and unique ID
+        id: vars
+        run: |
+          branch=$(git rev-parse --abbrev-ref HEAD)
+          commit_id=$(git rev-parse --short HEAD)
+          unique_id=$(uuidgen)
+          echo "branch=$branch" >> $GITHUB_ENV
+          echo "commit_id=$commit_id" >> $GITHUB_ENV
+          echo "unique_id=$unique_id" >> $GITHUB_ENV
+
       - name: Generate MediaWiki report for golangci-lint
-        run: .deploy/convert_golangci_lint_to_mediawiki.sh  golangci-lint-report.json >  static-and-security-check-report.wiki
+        run: |
+          echo "Report Id: ${branch}-${commit_id}-${unique_id}" > static-and-security-check-report.wiki
+          .deploy/convert_golangci_lint_to_mediawiki.sh  golangci-lint-report.json >>  static-and-security-check-report.wiki
 
       - name: Run tests and capture coverage
         run: |
@@ -64,7 +76,9 @@ jobs:
           go tool cover -func=coverage.out >  coverage.txt
 
       - name: Generate MediaWiki report for test coverage report
-        run: .deploy/convert_coverage_to_mediawiki.sh  coverage.txt >  test-coverage-report.wiki
+        run: |
+          echo "Report Id: ${branch}-${commit_id}-${unique_id}" >  test-coverage-report.wiki
+          .deploy/convert_coverage_to_mediawiki.sh  coverage.txt >>  test-coverage-report.wiki
 
       - name: Update Wiki pages with reports
         env:
