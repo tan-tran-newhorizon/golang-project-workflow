@@ -4,9 +4,14 @@ env:
   DISABLE_SWAGGER: "true"
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - "main"
+      - "setup/**"
+  pull_request:
+    branches-ignore:
+      - "**"
 
 jobs:
   test-and-build-app:
