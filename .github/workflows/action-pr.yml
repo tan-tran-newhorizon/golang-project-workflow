@@ -37,7 +37,7 @@ jobs:
         id: changed-files
         run: |
           echo "$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }})" > changed-files.txt
-          echo "Changed files"
+          echo "Changed files.txt"
           cat changed-files.txt
           
       - name: Filter Go files
@@ -59,9 +59,26 @@ jobs:
           cat go-files.txt
           golangci-lint run $(cat go-files.txt)
 
-      - name: Run tests on changed files
+      - name: Run tests and capture coverage
+        if: env.CHANGED_GO_FILES != ''
         run: |
-          git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }}) | grep '.go$' | xargs go test -coverprofile=coverage.out
+          echo "=== Test files ==="
+          # Read file names from the text file
+          while IFS= read -r file; do
+            if [[ "$file" == *.go && "$file" != *_test.go ]]; then
+              echo "==== $file"
+              # Extract test functions from each file
+              PACKAGE_NAME=$(dirname "$file")
+              TEST_FUNCTIONS=$(grep -oE '^func +Test[A-Za-z0-9_]+\(' "$file" | grep -vE '^\s*//' | sed -E 's/func +(Test[A-Za-z0-9_]+)\(.*\)/\1/' | paste -sd "|" - | tr -d '()' | sed 's/func //g')
+              # Run tests for each file
+              go test -v "./$PACKAGE_NAME" -run "$(echo ${TEST_FUNCTIONS} | tr -d ' ' | sed 's/|/|/g')" -coverprofile=coverage_tmp.out
+              # Merge coverage results into coverage.out
+              cat coverage_tmp.out >> coverage.out
+              # Remove temporary coverage file
+              rm coverage_tmp.out
+            fi
+          done < go-files.txt
+          go tool cover -func=coverage.out
 
       - name: Check coverage threshold
         if: env.CHANGED_GO_FILES != ''
