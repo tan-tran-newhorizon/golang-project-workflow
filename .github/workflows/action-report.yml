@@ -72,7 +72,7 @@ jobs:
 
       - name: Run tests and capture coverage
         run: |
-          go test ./... -coverprofile=coverage.out
+          TEST_MODE=true go test ./... -coverprofile=coverage.out
 
       - name: Display coverage report
         if: always()

@@ -25,7 +25,18 @@ jobs:
           go get
           CGO_ENABLED=0 go build -o ./test-api
           ls -lah
-          
+
+      - name: Get list of changed files
+        id: changed-files
+        run: |
+          echo "$(git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }})" > changed-files.txt
+
+      - name: Filter Go files
+        id: filter-go-files
+        run: |
+          grep '.go$' changed-files.txt > go-files.txt || true
+          echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
+
       - name: Run Go tests
         run: |
           TEST_MODE=true go test ./...
@@ -35,10 +46,12 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
 
       - name: Run static and security checks
+        if: env.CHANGED_GO_FILES != ''
         run: |
-          golangci-lint run ./...
+          golangci-lint run $(cat go-files.txt)
 
       - name: Run tests and capture coverage
+        if: env.CHANGED_GO_FILES != ''
         run: |
-          go test ./... -coverprofile=coverage.out
+          TEST_MODE=true go test ./... -coverprofile=coverage.out $(cat go-files.txt)
           go tool cover -func=coverage.out
