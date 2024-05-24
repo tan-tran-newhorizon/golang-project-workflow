@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Go tests
         run: |
-          TEST_MODE=true go test ./...
+          TEST_MODE=true go test -v ./...
 
       - name: Fetch all branches
         run: git fetch origin +refs/heads/*:refs/remotes/origin/*
@@ -37,14 +37,14 @@ jobs:
         id: changed-files
         run: |
           echo "$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }})" > changed-files.txt
-          echo "changed-files.txt"
+          echo "Changed files.txt"
           cat changed-files.txt
           
       - name: Filter Go files
         id: filter-go-files
         run: |
           grep '.go$' changed-files.txt > go-files.txt || true
-          echo "go-files.txt"
+          echo "=== Go files ==="
           cat go-files.txt
           echo "CHANGED_GO_FILES=$(cat go-files.txt)" >> $GITHUB_ENV
           
@@ -55,14 +55,34 @@ jobs:
       - name: Run static and security checks
         if: env.CHANGED_GO_FILES != ''
         run: |
-          echo "go-files.txt"
+          echo "=== Go files ==="
           cat go-files.txt
           golangci-lint run $(cat go-files.txt)
 
       - name: Run tests and capture coverage
         if: env.CHANGED_GO_FILES != ''
         run: |
-          echo "go-files.txt"
+          echo "=== Test files ==="
           cat go-files.txt
-          TEST_MODE=true go test $(cat go-files.txt) -coverprofile=coverage.out 
+          # Read file names from the text file
+          while IFS= read -r file; do
+            if [[ "$file" == *_test.go ]]; then
+              echo "==== $file"
+              # Extract test functions from each file
+              TEST_FUNCTIONS=$(grep -oE '^func +Test[A-Za-z0-9_]+\(' "$file" | grep -vE '^\s*//' | sed -E 's/func +(Test[A-Za-z0-9_]+)\(.*\)/\1/' | paste -sd "|" - | tr -d '()' | sed 's/func //g')
+              # Run tests for each file
+              go test -v "./$file" -run "$(echo ${TEST_FUNCTIONS} | tr -d ' ' | sed 's/|/|/g')"
+            fi
+          done < go-files.txt
           go tool cover -func=coverage.out
+
+      - name: Check coverage threshold
+        if: env.CHANGED_GO_FILES != ''
+        run: |
+          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | tr -d '%')
+          if [ "$coverage" -lt "30" ]; then
+            echo "Coverage is below threshold. Current coverage is $coverage%"
+            exit 1
+          else
+            echo "Coverage is above threshold. Current coverage is $coverage%"
+          fi
