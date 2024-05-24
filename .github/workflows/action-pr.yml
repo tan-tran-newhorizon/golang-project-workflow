@@ -62,6 +62,7 @@ jobs:
       - name: Run tests and capture coverage
         if: env.CHANGED_GO_FILES != ''
         run: |
+          echo "" > coverage.out
           echo "=== Test files ==="
           # Read file names from the text file
           while IFS= read -r file; do
